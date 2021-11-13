@@ -50,6 +50,14 @@ class TimeChecker(BotPlugin):
 
 2# 从 yaml 设定提取禁言弹幕列表 (需要有房管权限)
 
+```yaml
+# config/mute.yml
+bad_danmaku:
+  - '主播是个大伞兵'
+  - '主播你寄吧谁啊'
+  - '主播NMSL'
+```
+
 ```py
 # plugins/mute.py
 from plugin import BotPlugin, DanmakuMessage, load_config
@@ -175,7 +183,7 @@ async def on_command_received(self, cmd, command):
         SuperChatDeleteMessage.from_command(command['data'])
 ```
 
-###[视频演示](https://www.bilibili.com/video/BV1LT4y1R7Xk)
+[__视频演示__](https://www.bilibili.com/video/BV1LT4y1R7Xk)
 
 ### 鸣谢
 
