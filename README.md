@@ -175,6 +175,8 @@ async def on_command_received(self, cmd, command):
         SuperChatDeleteMessage.from_command(command['data'])
 ```
 
+###[视频演示](https://www.bilibili.com/video/BV1LT4y1R7Xk)
+
 ### 鸣谢
 
 - [blivedm](https://github.com/xfgryujk/blivedm)
