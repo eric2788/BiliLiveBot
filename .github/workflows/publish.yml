@@ -1,11 +1,9 @@
-name: Package Application with Pyinstaller
-
 env:
   version: 0.1
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
   exe_name: 'bili_live_bot'
 
-
+name: Package Application with Pyinstaller
 on:
   push:
     branches: [ develop ] # for test
