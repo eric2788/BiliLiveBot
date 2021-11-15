@@ -39,7 +39,7 @@ async def login(session: ClientSession) -> bool:
 
         url = res['data']['url']
         qr = qrcode.QRCode()
-        logging.info('請掃描下列二維碼進行登入... (或者到目錄下尋找 png)')
+        logging.info('請掃描下列二維碼進行登入... (或者到目錄下尋找 qrcode.png)')
 
         qr.add_data(url)
         qr.print_ascii(invert=True)

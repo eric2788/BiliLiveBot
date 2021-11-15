@@ -8,23 +8,10 @@ env:
 name: Package Application with Pyinstaller
 on:
   push:
-    branches: [ develop ] # for test
+    branches: [ master ] # for test
 
 jobs:
-
-  test_upload_artifacts:
-    runs-on: ubuntu-latest
-    steps:
-    - name: create temp file
-      run: |
-        echo "hello world" > test.txt
-    - uses: actions/upload-artifact@v2
-      with:
-        name: ${{ env.artifact_name }}
-        path: ./test.txt
-
   build_windows:
-    if: ${{ false }}
     runs-on: windows-latest
 
     steps:
@@ -58,7 +45,6 @@ jobs:
         path: ./dist/${{ env.artifact_name }}_windows.exe
 
   build_linux:
-    if: ${{ false }}
     runs-on: ubuntu-latest
 
     steps:
@@ -92,7 +78,7 @@ jobs:
         path: ./dist/${{ env.artifact_name }}_linux
   
   upload_releases:
-    needs: test_upload_artifacts
+    needs: [build_windows, build_linux]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/download-artifact@v2
@@ -119,12 +105,14 @@ jobs:
       with:
         tag_name: ${{ env.version }}
         release_name: Release ${{ github.repository }}-${{ env.version }}
-        body: check the commits for update
+        body: |
+          '.zip 內有 window 和 linux 的點擊運行程序'
+          '如欲無需 python 環境，可以下載 zip 直接打開程序運行'
         draft: false
         prerelease: false
 
     - name: Upload Release
-      id: upload-release-asset-xpi
+      id: upload-release-zip
       uses: actions/upload-release-asset@v1
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
