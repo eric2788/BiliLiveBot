@@ -1,9 +1,9 @@
 env:
   version: 0.1
   pyinstaller_version: 4.7
-  main: main.py
+  main: main
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
-  exe_name: 'bili_live_bot'
+  artifact_name: 'bili_live_bot'
 
 name: Package Application with Pyinstaller
 on:
@@ -11,7 +11,7 @@ on:
     branches: [ develop ] # for test
 
 jobs:
-  build:
+  build_windows:
     runs-on: windows-latest
 
     steps:
@@ -31,17 +31,56 @@ jobs:
       run: |
         pip install -r requirements.txt
         pip install pyinstaller==${{ env.pyinstaller_version }}
-        pyinstaller --clean -y --dist ./dist/windows --onefile ${{ env.main }}
-        chown -R --reference=. ./dist/windows
+        pyinstaller --clean -y --dist ./dist --onefile ${{ env.main }}.py
+        chown -R --reference=. ./dist
 
     - name: Rename File
       run: |
-        ren /dist/windows/main.exe ${{ env.exe_name }}.exe
+        ren dist/${{ env.main }}.exe ${{ env.artifact_name }}.exe
 
     - uses: actions/upload-artifact@v2
       with:
         name: bili_live_bot
-        path: ./dist/windows
+        path: ./dist/${{ env.artifact_name }}.exe
+
+  build_linux:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    #- name: Package Application Windows
+    #  uses: JackMcKew/pyinstaller-action-windows@main
+    #  with:
+    #    path: '.'
+
+    - name: setup python 3.9.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9.7'
+
+    - name: install dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install pyinstaller==${{ env.pyinstaller_version }}
+        pyinstaller --clean -y --dist ./dist --onefile ${{ env.main }}.py
+        chown -R --reference=. ./dist
+
+    - name: Rename File
+      run: |
+        mv ./dist/${{ env.main }} ./dist/${{ env.artifact_name }}
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: bili_live_bot
+        path: ./dist/${{ env.artifact_name }}
+  
+  upload_releases:
+    steps:
+    - uses: actions/download-artifact@v2
+      id: download
+      with:
+        name: bili_live_bot
 
     - name: Delete tag and release
       id: delete-tag-release
@@ -54,4 +93,4 @@ jobs:
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
       with:
-        files: ./dist/windows/${{ env.exe_name }}.exe
+        files: ${{steps.download.outputs.download-path}}
