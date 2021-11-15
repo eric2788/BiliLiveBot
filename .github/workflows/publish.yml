@@ -1,0 +1,123 @@
+env:
+  version: 0.1
+  pyinstaller_version: 4.7
+  main: main
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+  artifact_name: 'bili_live_bot'
+
+name: Package Application with Pyinstaller
+on:
+  push:
+    branches: [ master ] # for test
+
+jobs:
+  build_windows:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    #- name: Package Application Windows
+    #  uses: JackMcKew/pyinstaller-action-windows@main
+    #  with:
+    #    path: '.'
+
+    - name: setup python 3.9.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9.7'
+
+    - name: install dependencies
+      run: |
+        python -m pip install --upgrade pip 
+        pip install -r requirements.txt
+        pip install pyinstaller==${{ env.pyinstaller_version }}
+        pyinstaller --clean -y --dist ./dist --onefile ${{ env.main }}.py
+        chown -R --reference=. ./dist
+
+    - name: Rename File
+      run: |
+        ren dist/${{ env.main }}.exe ${{ env.artifact_name }}_windows.exe
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: ${{ env.artifact_name }}
+        path: ./dist/${{ env.artifact_name }}_windows.exe
+
+  build_linux:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    #- name: Package Application Windows
+    #  uses: JackMcKew/pyinstaller-action-windows@main
+    #  with:
+    #    path: '.'
+
+    - name: setup python 3.9.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9.7'
+
+    - name: install dependencies
+      run: |
+        python -m pip install --upgrade pip 
+        pip install -r requirements.txt
+        pip install pyinstaller==${{ env.pyinstaller_version }}
+        pyinstaller --clean -y --dist ./dist --onefile ${{ env.main }}.py
+        chown -R --reference=. ./dist
+
+    - name: Rename File
+      run: |
+        mv ./dist/${{ env.main }} ./dist/${{ env.artifact_name }}_linux
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: ${{ env.artifact_name }}
+        path: ./dist/${{ env.artifact_name }}_linux
+  
+  upload_releases:
+    needs: [build_windows, build_linux]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/download-artifact@v2
+      id: download
+      with:
+        name: ${{ env.artifact_name }}
+
+    - name: Delete tag and release
+      id: delete-tag-release
+      uses: dev-drprasad/delete-tag-and-release@v0.1.2
+      with:
+        tag_name: ${{ env.version }}
+        delete_release: true
+
+    - name: zip the directory
+      run: |
+        [ -d ${{steps.download.outputs.download-path}} ] && ls -la ${{ steps.download.outputs.download-path }}
+        cd ${{steps.download.outputs.download-path}}
+        zip -r ${{ env.artifact_name }}.zip .
+    
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      with:
+        tag_name: ${{ env.version }}
+        release_name: Release ${{ github.repository }}-${{ env.version }}
+        body: |
+          .zip 內有 window 和 linux 的點擊運行程序
+          如欲無需 python 環境，可以下載 zip 直接打開程序運行
+        draft: false
+        prerelease: false
+
+    - name: Upload Release
+      id: upload-release-zip
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+        asset_path: ./${{ env.artifact_name }}.zip
+        asset_name: ${{ env.artifact_name }}.zip
+        asset_content_type: application/zip
+
+    

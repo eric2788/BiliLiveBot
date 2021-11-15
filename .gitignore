@@ -1,0 +1,6 @@
+/data/
+/dist/
+/build/
+main.spec
+start.bat
+**/__pycache__/**
