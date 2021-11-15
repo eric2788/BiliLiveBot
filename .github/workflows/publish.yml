@@ -12,7 +12,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v2
@@ -34,9 +34,9 @@ jobs:
         pyinstaller --clean -y --dist ./dist/windows --onefile ${{ env.main }}
         chown -R --reference=. ./dist/windows
 
-    - name: Rename Files
+    - name: Rename File
       run: |
-        mv ./dist/windows/main.exe ./dist/windows/${{ env.exe_name }}.exe
+        ren /dist/windows/main.exe ${{ env.exe_name }}.exe
 
     - uses: actions/upload-artifact@v2
       with:
