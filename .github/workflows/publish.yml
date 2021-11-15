@@ -20,7 +20,7 @@ jobs:
         echo "hello world" > test.txt
     - uses: actions/upload-artifact@v2
       with:
-        name: bili_live_bot
+        name: ${{ env.artifact_name }}
         path: ./test.txt
 
   build_windows:
@@ -54,7 +54,7 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-        name: bili_live_bot
+        name: ${{ env.artifact_name }}
         path: ./dist/${{ env.artifact_name }}_windows.exe
 
   build_linux:
@@ -88,7 +88,7 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-        name: bili_live_bot
+        name: ${{ env.artifact_name }}
         path: ./dist/${{ env.artifact_name }}_linux
   
   upload_releases:
@@ -98,7 +98,7 @@ jobs:
     - uses: actions/download-artifact@v2
       id: download
       with:
-        name: bili_live_bot
+        name: ${{ env.artifact_name }}
 
     - name: Delete tag and release
       id: delete-tag-release
@@ -111,7 +111,7 @@ jobs:
       run: |
         echo ${{steps.download.outputs.download-path}}
         [ -d ${{steps.download.outputs.download-path}} ] && ls -la ${{ steps.download.outputs.download-path }}
-        zip -r ${{ artifact_name }}.zip ${{steps.download.outputs.download-path}}
+        zip -r ${{ env.artifact_name }}.zip ${{steps.download.outputs.download-path}}
     
     - name: Create Release
       id: create_release
