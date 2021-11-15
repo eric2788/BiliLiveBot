@@ -42,7 +42,7 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: bili_live_bot
-        path: ./dist/${{ env.artifact_name }}.exe
+        path: ./dist/${{ env.artifact_name }}_windows.exe
 
   build_linux:
     runs-on: ubuntu-latest
@@ -75,7 +75,7 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: bili_live_bot
-        path: ./dist/${{ env.artifact_name }}
+        path: ./dist/${{ env.artifact_name }}_linux
   
   upload_releases:
     needs: [build_linux, build_windows]
