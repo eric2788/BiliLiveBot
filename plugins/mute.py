@@ -5,7 +5,7 @@ class MuteUser(BotPlugin):
     def __init__(self) -> None:
         super().__init__()
         data = load_config('mute.yml')
-        self.bad_danmaku = data['bad_danmaku'] if data != None else []
+        self.bad_danmaku = data['bad_danmaku'] if 'bad_danmaku' in data else []
         print(f'禁言弹幕: {self.bad_danmaku}')
 
     async def on_command_received(self, cmd, data):

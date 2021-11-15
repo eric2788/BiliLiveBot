@@ -1,14 +1,9 @@
 from abc import abstractmethod
 from enum import IntEnum
-from genericpath import exists
-import yaml
+from file_loader import load_config as load_plugin_config
 
-def load_config(yml: str) -> any:
-    cfg = f'config/{yml}'
-    if not exists(cfg):
-        return None
-    with open(cfg, encoding='utf-8') as f:
-        return yaml.safe_load(f)
+def load_config(yml: str, default: dict = {}) -> any:
+    return load_plugin_config(yml, default)
 
 class DanmakuPosition(IntEnum):
     TOP = 5,

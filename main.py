@@ -4,7 +4,8 @@ import logging
 from aiohttp.client import ClientSession
 import yaml, json
 from bilibili_bot import BiliLiveBot
-from plugins_loader import load_plugins
+from file_loader import load_default_config, make_folder
+from plugins_loader import copy_default_plugins, load_plugins
 from bilibili_api import get_cookies, login, user_cookies
 
 SESSION_DATA_PATH = 'data/session.json'
@@ -41,8 +42,8 @@ async def start_bot(room: int):
 
             bot = BiliLiveBot(room_id=room, uid=int(uid), session=session, loop=session._loop)
             await bot.init_room()
-            await bot.start()
             logging.info(f'機器人已啟動。')
+            await bot.start()
             #while True:
             #    await asyncio.sleep(60)
             await bot.close()
@@ -55,10 +56,14 @@ async def start_bot(room: int):
 
 if __name__ == '__main__':
 
-    with open('config/config.yaml') as f:
-        data = yaml.safe_load(f)
+    make_folder('data')
+    make_folder('config')
+    make_folder('plugins')
+    
+    data = load_default_config()
 
     logging.basicConfig(level=logging.INFO if not data['debug'] else logging.DEBUG)
+
     room = data['roomid']
 
     BiliLiveBot.BOT_PLUGINS = load_plugins()
