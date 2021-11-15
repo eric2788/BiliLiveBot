@@ -2,10 +2,10 @@ import asyncio
 from genericpath import exists
 import logging
 from aiohttp.client import ClientSession
-import yaml, json
+import json
 from bilibili_bot import BiliLiveBot
 from file_loader import load_default_config, make_folder
-from plugins_loader import copy_default_plugins, load_plugins
+from plugins_loader import load_plugins
 from bilibili_api import get_cookies, login, user_cookies
 
 SESSION_DATA_PATH = 'data/session.json'

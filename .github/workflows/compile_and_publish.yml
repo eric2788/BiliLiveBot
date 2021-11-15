@@ -1,0 +1,52 @@
+name: Package Application with Pyinstaller
+
+env:
+  version: 0.1
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+  exe_name: 'bili_live_bot'
+
+
+on:
+  push:
+    branches: [ develop ] # for test
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Package Application Windows
+      uses: JackMcKew/pyinstaller-action-windows@main
+      with:
+        path: '.'
+    - name: Package Application Linux
+      uses: JackMcKew/pyinstaller-action-linux@main
+      with:
+        path: '.'
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: bili_live_bot
+        path: ./dist
+
+    - uses: Rename Files
+      run: |
+        mv ./dist/windows/main.exe ./dist/${{ env.exe_name }}_windows.exe
+        mv ./dist/linux/main ./dist/${{ env.exe_name }}_linux
+
+    - name: Delete tag and release
+      id: delete-tag-release
+      uses: dev-drprasad/delete-tag-and-release@v0.1.2
+      with:
+        tag_name: ${{ env.version }}
+        delete_release: true
+    
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: |
+          ./dist/${{ env.exe_name }}_windows.exe
+          ./dist/${{ env.exe_name }}_linux
