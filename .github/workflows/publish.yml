@@ -11,7 +11,19 @@ on:
     branches: [ develop ] # for test
 
 jobs:
+
+  test_upload_artifacts:
+    runs-on: ubuntu-latest
+    - name: create temp file
+      run: |
+        echo "hello world" > test.txt
+    - uses: actions/upload-artifact@v2
+      with:
+        name: bili_live_bot
+        path: ./test.txt
+
   build_windows:
+    if: ${{ false }}
     runs-on: windows-latest
 
     steps:
@@ -45,6 +57,7 @@ jobs:
         path: ./dist/${{ env.artifact_name }}_windows.exe
 
   build_linux:
+    if: ${{ false }}
     runs-on: ubuntu-latest
 
     steps:
@@ -78,7 +91,7 @@ jobs:
         path: ./dist/${{ env.artifact_name }}_linux
   
   upload_releases:
-    needs: [build_linux, build_windows]
+    needs: test_upload_artifacts
     runs-on: ubuntu-latest
     steps:
     - uses: actions/download-artifact@v2
@@ -93,9 +106,29 @@ jobs:
         tag_name: ${{ env.version }}
         delete_release: true
 
-    - name: echo the download path
+    - name: zip the directory
       run: |
         echo ${{steps.download.outputs.download-path}}
         [ -d ${{steps.download.outputs.download-path}} ] && ls -la ${{ steps.download.outputs.download-path }}
+        zip -r ${{ artifact_name }}.zip ${{steps.download.outputs.download-path}}
+    
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      with:
+        tag_name: ${{ env.version }}
+        release_name: Release ${{ github.repository }}-${{ env.version }}
+        body: check the commits for update
+        draft: false
+        prerelease: false
+
+    - name: Upload Release
+      id: upload-release-asset-xpi
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+        asset_path: ./${{ artifact_name }}.zip
+        asset_name: ${{ artifact_name }}.zip
+        asset_content_type: application/zip
 
     
