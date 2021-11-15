@@ -1,5 +1,6 @@
 env:
   version: 0.1
+  pyinstaller_version: 4.7
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
   exe_name: 'bili_live_bot'
 
@@ -14,25 +15,32 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    
+    #- name: Package Application Windows
+    #  uses: JackMcKew/pyinstaller-action-windows@main
+    #  with:
+    #    path: '.'
 
-    - name: Package Application Windows
-      uses: JackMcKew/pyinstaller-action-windows@main
+    - name: setup python 3.9.7
+      uses: actions/setup-python@v2
       with:
-        path: '.'
-    - name: Package Application Linux
-      uses: JackMcKew/pyinstaller-action-linux@main
-      with:
-        path: '.'
+        python-version: '3.9.7'
+
+    - name: install dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install pyinstaller==${{ env.pyinstaller_version }}
+        pyinstaller --clean -y --dist ./dist/windows --workpath /tmp .
+        chown -R --reference=. ./dist/windows
+
+    - name: Rename Files
+      run: |
+        mv ./dist/windows/main.exe ./dist/windows/${{ env.exe_name }}.exe
 
     - uses: actions/upload-artifact@v2
       with:
         name: bili_live_bot
-        path: ./dist
-
-    - name: Rename Files
-      run: |
-        mv ./dist/windows/main.exe ./dist/${{ env.exe_name }}_windows.exe
-        mv ./dist/linux/main ./dist/${{ env.exe_name }}_linux
+        path: ./dist/windows
 
     - name: Delete tag and release
       id: delete-tag-release
@@ -45,6 +53,4 @@ jobs:
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
       with:
-        files: |
-          ./dist/${{ env.exe_name }}_windows.exe
-          ./dist/${{ env.exe_name }}_linux
+        files: ./dist/windows/${{ env.exe_name }}.exe
