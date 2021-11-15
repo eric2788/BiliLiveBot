@@ -76,6 +76,7 @@ jobs:
         path: ./dist/${{ env.artifact_name }}
   
   upload_releases:
+    needs: [build_linux, build_windows]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/download-artifact@v2
