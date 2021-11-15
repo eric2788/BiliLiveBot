@@ -28,7 +28,7 @@ def load_config(yml: str, default_values: dict) -> any:
         default_values[k] = v
     if default_values.keys() != data.keys():
         with open(path, mode='w', encoding='utf-8') as f:
-            yaml.safe_dump(default_values, f)
+            yaml.safe_dump(default_values, f, allow_unicode=True)
     return default_values
 
 def load_default_config() -> any:
