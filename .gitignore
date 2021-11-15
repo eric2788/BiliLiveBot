@@ -1,6 +1,6 @@
 /data/
 /dist/
 /build/
-main.spec
-start.bat
+*.spec
+build.bat
 **/__pycache__/**
