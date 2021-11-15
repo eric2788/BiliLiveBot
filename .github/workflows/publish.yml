@@ -109,9 +109,9 @@ jobs:
 
     - name: zip the directory
       run: |
-        echo ${{steps.download.outputs.download-path}}
         [ -d ${{steps.download.outputs.download-path}} ] && ls -la ${{ steps.download.outputs.download-path }}
-        zip -r ${{ env.artifact_name }}.zip ${{steps.download.outputs.download-path}}
+        cd ${{steps.download.outputs.download-path}}
+        zip -r ${{ env.artifact_name }}.zip .
     
     - name: Create Release
       id: create_release
