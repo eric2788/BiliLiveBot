@@ -1,6 +1,7 @@
 env:
   version: 0.1
   pyinstaller_version: 4.7
+  main: main.py
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
   exe_name: 'bili_live_bot'
 
@@ -30,7 +31,7 @@ jobs:
       run: |
         pip install -r requirements.txt
         pip install pyinstaller==${{ env.pyinstaller_version }}
-        pyinstaller --clean -y --dist ./dist/windows --workpath /tmp .
+        pyinstaller --clean -y --dist ./dist/windows --onefile ${{ env.main }}
         chown -R --reference=. ./dist/windows
 
     - name: Rename Files
