@@ -1,5 +1,5 @@
 env:
-  version: 0.1
+  version: 0.2
   pyinstaller_version: 4.7
   main: main
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
