@@ -29,6 +29,7 @@ jobs:
 
     - name: install dependencies
       run: |
+        python -m pip install --upgrade pip 
         pip install -r requirements.txt
         pip install pyinstaller==${{ env.pyinstaller_version }}
         pyinstaller --clean -y --dist ./dist --onefile ${{ env.main }}.py
@@ -36,7 +37,7 @@ jobs:
 
     - name: Rename File
       run: |
-        ren dist/${{ env.main }}.exe ${{ env.artifact_name }}.exe
+        ren dist/${{ env.main }}.exe ${{ env.artifact_name }}_windows.exe
 
     - uses: actions/upload-artifact@v2
       with:
@@ -61,6 +62,7 @@ jobs:
 
     - name: install dependencies
       run: |
+        python -m pip install --upgrade pip 
         pip install -r requirements.txt
         pip install pyinstaller==${{ env.pyinstaller_version }}
         pyinstaller --clean -y --dist ./dist --onefile ${{ env.main }}.py
@@ -68,7 +70,7 @@ jobs:
 
     - name: Rename File
       run: |
-        mv ./dist/${{ env.main }} ./dist/${{ env.artifact_name }}
+        mv ./dist/${{ env.main }} ./dist/${{ env.artifact_name }}_linux
 
     - uses: actions/upload-artifact@v2
       with:
@@ -90,9 +92,10 @@ jobs:
       with:
         tag_name: ${{ env.version }}
         delete_release: true
+
+    - name: echo the download path
+      run: |
+        echo ${{steps.download.outputs.download-path}}
+        [ -d ${{steps.download.outputs.download-path}} ] && ls -la ${{ steps.download.outputs.download-path }}
+
     
-    - name: Create Release
-      uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/')
-      with:
-        files: ${{steps.download.outputs.download-path}}
