@@ -1,7 +1,5 @@
 env:
   version: 0.2
-  pyinstaller_version: 4.7
-  main: main
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
   artifact_name: 'bili_live_bot'
 
@@ -16,66 +14,34 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    
-    #- name: Package Application Windows
-    #  uses: JackMcKew/pyinstaller-action-windows@main
-    #  with:
-    #    path: '.'
 
-    - name: setup python 3.9.7
-      uses: actions/setup-python@v2
+    - name: build exe
+      uses: eric2788/pyinstaller-build@master
       with:
-        python-version: '3.9.7'
-
-    - name: install dependencies
-      run: |
-        python -m pip install --upgrade pip 
-        pip install -r requirements.txt
-        pip install pyinstaller==${{ env.pyinstaller_version }}
-        pyinstaller --clean -y --dist ./dist --onefile ${{ env.main }}.py
-        chown -R --reference=. ./dist
-
-    - name: Rename File
-      run: |
-        ren dist/${{ env.main }}.exe ${{ env.artifact_name }}_windows.exe
+        main: main
+        artifact: ${{ env.artifact_name }}_windows 
 
     - uses: actions/upload-artifact@v2
       with:
         name: ${{ env.artifact_name }}
-        path: ./dist/${{ env.artifact_name }}_windows.exe
+        path: dist
 
   build_linux:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
-    
-    #- name: Package Application Windows
-    #  uses: JackMcKew/pyinstaller-action-windows@main
-    #  with:
-    #    path: '.'
 
-    - name: setup python 3.9.7
-      uses: actions/setup-python@v2
+    - name: build exe
+      uses: eric2788/pyinstaller-build@master
       with:
-        python-version: '3.9.7'
-
-    - name: install dependencies
-      run: |
-        python -m pip install --upgrade pip 
-        pip install -r requirements.txt
-        pip install pyinstaller==${{ env.pyinstaller_version }}
-        pyinstaller --clean -y --dist ./dist --onefile ${{ env.main }}.py
-        chown -R --reference=. ./dist
-
-    - name: Rename File
-      run: |
-        mv ./dist/${{ env.main }} ./dist/${{ env.artifact_name }}_linux
+        main: main
+        artifact: ${{ env.artifact_name }}_linux
 
     - uses: actions/upload-artifact@v2
       with:
         name: ${{ env.artifact_name }}
-        path: ./dist/${{ env.artifact_name }}_linux
+        path: dist
   
   upload_releases:
     needs: [build_windows, build_linux]
