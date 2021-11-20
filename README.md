@@ -89,7 +89,6 @@ bad_danmaku:
 # plugins/mute.py
 from plugin import BotPlugin, DanmakuMessage, load_config
 
-# 默認設定
 DEFAULT_CONTENT = {
     'bad_danmaku': [
         '主播是个大伞兵',
@@ -98,15 +97,12 @@ DEFAULT_CONTENT = {
     ]
 }
 
-
 class MuteUser(BotPlugin):
 
     def __init__(self) -> None:
         super().__init__()
-        # 使用 load_config 从 config/ 目录加载 mute.yml
-        # 如果 找不到 mute.yml 則使用 默認設定 生成一個 yml 並保存
-        data = load_config('mute.yml', DEFAULT_CONTENT) 
-        self.bad_danmaku = data['bad_danmaku'] if data != None else []
+        data = load_config('mute.yml', DEFAULT_CONTENT)
+        self.bad_danmaku = data['bad_danmaku'] if 'bad_danmaku' in data else []
         print(f'禁言弹幕: {self.bad_danmaku}')
 
     async def on_command_received(self, cmd, data):
@@ -127,6 +123,9 @@ class MuteUser(BotPlugin):
 
 ```py
 # plugins/thanks_gift.py
+from plugin import BotPlugin, GiftMessage
+
+
 class ThanksGift(BotPlugin):
 
     async def on_command_received(self, cmd, data):
