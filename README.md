@@ -1,3 +1,8 @@
+> [!IMPORTANT]
+> 本项目目前因为B站直播改版已经作废，如果希望启动重写项目，可以[点击这里](https://github.com/eric2788/BiliLiveBot/discussions/6)
+
+---
+
 ## BiliLiveBot
 
 可插件化管理的B站直播间机器人
